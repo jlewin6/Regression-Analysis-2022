@@ -58,6 +58,10 @@ summary(A1_model)
 
 Use $\mu_1$, $\mu_2$, and $\mu_3$  as notation for the three mean parameters and define these parameters clearly based on the context of the topic above  (i.e. explain what  $\mu_1$, $\mu_2$, and $\mu_3$ mean in words in the context of this problem). Find the estimates of these parameters.
 
+
+
+
+
 ## Question A3 - 5 pts
 
 Use the ANOVA table in Question A1 to answer the following questions:
