@@ -56,11 +56,14 @@ summary(A1_model)
 
 ## Question A2 - 3 pts
 
-Use $\mu_1$, $\mu_2$, and $\mu_3$  as notation for the three mean parameters and define these parameters clearly based on the context of the topic above  (i.e. explain what  $\mu_1$, $\mu_2$, and $\mu_3$ mean in words in the context of this problem). Find the estimates of these parameters.
+Use $\mu_1$, $\mu_2$, and $\mu_3$  as notation for the three mean parameters and define these parameters clearly based on the context of the topic above  (i.e. explain what  $\mu_1$, $\mu_2$, and $\mu_3$ mean in words in the context of this problem). Find the estimates of these parameters.    
 
+In the topic above, the experiment measured circadian rhythm through the daily cycle of melatonin production in 22 subjects randomly assigned to one of three light treatments. Subjects were woken from sleep and for three hours were exposed to bright lights applied to the eyes only, to the knees only or to neither (control group). $\mu_1$,$\mu_2$, and $\mu_3$ are the three mean parameters meant to represent the control, and two test groups for the experiment (Knees & Eyes). 
 
-
-
+The estimates are:  
+$\mu_1$ for the control group -0.039  
+$\mu_2$ for the test group Knees -1.551  
+$\mu_3$ for the test group Eyes -0.336  
 
 ## Question A3 - 5 pts
 
@@ -68,13 +71,21 @@ Use the ANOVA table in Question A1 to answer the following questions:
 
 a. **1 pts** Write the null hypothesis of the ANOVA $F$-test, $H_0$
 
+There is no difference in the estimated mean phase shift in circadian rhythm between the control group, and the test groups. 
+
 b. **1 pts** Write the alternative hypothesis of the ANOVA $F$-test, $H_A$
+
+There is significant change in the estimated mean phase shift in circadian rhythm between the control group, and the test groups. 
 
 c. **1 pts** Fill in the blanks for the degrees of freedom of the ANOVA $F$-test statistic:   $F$(____, _____)
 
 d. **1 pts** What is the p-value of the ANOVA $F$-test?
 
+The p-value of the ANOVA $F$-test is 0.00447 
+
 e. **1 pts** According the the results of the ANOVA $F$-test, does light treatment affect phase shift?  Use an $\alpha$-level of 0.05.
+
+Yes, according to the results of the ANOVA $F$-test, light treament affects the phase shift because our p-value is less than our alpha. 
 
 # Part B. Simple Linear Regression
 
@@ -101,19 +112,34 @@ a. **3 pts** Use a scatter plot to describe the relationship between CPU perform
 
 ```{r}
 # Your code here...
+plot(data$chmax,data$performance, 
+     xlab = "Max # Channels", ylab = "CPU Performance"
+     )
 
 ```
+In general we see that CPU performance tends to increase with the number of channels available, with an interesting drop off in performance around xxx channels. This indicates a generally positive linear direction with 
+
+form: is the association linear or nonlinear  
+
+direction: is the form positive or negative
 
 b. **3 pts** What is the value of the correlation coefficient between _performance_ and _chmax_? Please interpret the strength of the correlation based on the correlation coefficient.
 
 ```{r}
 # Your code here...
+cor(data$chmax, data$performance)
 
 ```
 
+The correlation coefficient is 0.6052093 which shows there's a fairly strong positive correlation between the two groups. 
+
 c. **2 pts** Based on this exploratory analysis, would you recommend a simple linear regression model for the relationship?
 
+Yes, I would start off with recommending a simple linear regression model is fit to this data due to there being a somewhat strong presence of a linear relationship between the data as well as there being a good positive correlation between the two groups. 
+
 d. **1 pts** Based on the analysis above, would you pursue a transformation of the data? *Do not transform the data.*
+
+Due to the odd drop off in performance after a certain number of channels, and the large grouping of data at the lower left corner, it may be worth exploring some type of transformation to better distribute the data across the x axis. Potentially a log transformtion. 
 
 ## Question B2: Fitting the Simple Linear Regression Model - 11 pts
 
