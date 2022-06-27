@@ -1,0 +1,442 @@
+---
+title: "ISYE6414 - Midterm Exam - Open Book Section - Part 2"
+output:
+  html_document: default
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Instructions
+
+This R Markdown file includes the questions, the empty code chunk sections for your code, and the text blocks for your responses. Answer the questions below by completing this R Markdown file. You may make slight adjustments to get the file to knit/convert but otherwise keep the formatting the same. Once you've finished answering the questions, submit your responses in a single knitted file as *HTML* only.
+
+There are 10 questions total, each worth between 3-10 points. Partial credit may be given if your code is correct but your conclusion is incorrect or vice versa.
+
+*Next Steps:*
+
+1.  Save this .Rmd file in your R working directory - the same directory where you will download the "bikerental.csv" data file into. Having both files in the same directory will help in reading the .csv file.
+
+2.  Read the question and create the R code necessary within the code chunk section immediately below each question. Knitting this file will generate the output and insert it into the section below the code chunk. 
+
+3.  Type your answer to the questions in the text block provided immediately after the response prompt.
+
+4.  Once you've finished answering all questions, knit this file and submit the knitted file as *HTML* on Canvas.
+
+### Mock Example Question
+
+This will be the exam question - each question is already copied from Canvas and inserted into individual text blocks below, *you do not need to copy/paste the questions from the online Canvas exam.*
+
+```{r}
+# Example code chunk area. Enter your code below the comment`
+
+
+```
+
+**Mock Response to Example Question**:  This is the section where you type your written answers to the question. Depending on the question asked, your typed response may be a number, a list of variables, a few sentences, or a combination of these elements. 
+
+
+
+**Ready? Let's begin. We wish you the best of luck!**
+
+**Recommended Packages**
+```{r}
+library(car)
+#install.packages("MASS")
+# library(MASS)
+```
+
+## Bike Rental Data Analysis
+
+For this exam, you will be building a model to predict the number of bikes rented in a major city in a given hour.
+
+The "bikerental.csv" data set consists of the following variables:
+
+* *Rented.Bike.Count*: number of bikes rented (one hour)
+* *Temperature*: Temperature in Celsius
+* *Humidity*: Percent humidity
+* *Wind.speed*: Wind Speed (m/s)
+* *Visibility*: 10m visibility
+* *Dew.Point.Temperature*: Dew Point Temperature in Celsius
+* *Solar.Radiation*: Solar Radiation measured in (MJ/m^2)
+* *Rainfall*: Rainfall in mm (one hour)
+* *Snowfall*: Snowfall in cm (one hour)
+* *Season*: spring, summer, autumn, winter
+* *Holiday*:  yes/no
+* *Time*: morning, afternoon, evening, night
+
+
+Read the data and answer the questions below. Assume a significance threshold of 0.05 for hypothesis tests unless stated otherwise.
+
+```{r}
+# Read the data set
+bike = read.csv('bikerental.csv',header=TRUE)
+#Set variables as categorical
+bike$Seasons<-as.factor(bike$Seasons)
+bike$Holiday<-as.factor(bike$Holiday)
+bike$Time<-as.factor(bike$Time)
+head(bike)
+```
+
+**Note:** For all of the following questions, treat all variables as quantitative variables except for *Seasons*,  *Holiday* and *Time*.  They have already been converted to categorical variables in the above code. 
+
+
+### Question 1 - Exploratory Data Analysis of Categorical Variable
+
+
+Create plots of the response, Rented Bike Count, against four quantitative predictors Temperature, Rainfall, Wind speed and Dew point.
+
+```{r}
+#Code to create boxplot...
+#boxplot(Rented.Bike.Count~Temperature, data=bike, col='grey', main ="Boxplot of Rented Bike Count")
+
+par(mfrow=c(2,2))
+plot(bike$Temperature,bike$Rented.Bike.Count, 
+        col=ifelse(bike$Rented.Bike.Count == max(bike$Rented.Bike.Count), 'red', 'black'))
+plot(bike$Rainfall,bike$Rented.Bike.Count, 
+        col=ifelse(bike$Rented.Bike.Count== max(bike$Rented.Bike.Count), 'red', 'black'))
+plot(bike$Wind.speed,bike$Rented.Bike.Count, 
+        col=ifelse(bike$Rented.Bike.Count == max(bike$Rented.Bike.Count), 'red', 'black'))
+plot(bike$Dew.point.temperature,bike$Rented.Bike.Count, 
+        col=ifelse(bike$Rented.Bike.Count == max(bike$Rented.Bike.Count), 'red', 'black'))
+
+
+
+```
+
+A) By visual inspection, describe the general trend (direction and form) of each plot.
+
+**Response to Question 1A**: 
+
+  Temperature: there is a somewhat positive linear trend between the response and predictor temperature. However, we should be careful as there is a drop off where the temperature gets too hot and people stop renting. Relationship could be more parabolic due to this. 
+  Rainfall: Obviously the most of the bike rentals would be occurring when it is not raining. However there are some interesting points where there are a relatively high number of rentals even with rain. Very skewed towards zero rain though. 
+  Wind: There doesn't seem to be too much linear trend within this group either. A slight postive trend but overall nothing very strong. We see that for the most part wind speed also has a threshold where rentals steeply drop off.
+  Dew Point: Has a very interesting and seemingly strong positive linear trend. 
+
+B) From this plot, does *Rainfall* appear useful in predicting *Rented.Bike.Count*? Explain how you came to your
+conclusion.  
+
+**Response to Question 1B**: 
+In its current state, rainfall may not be useful in predicting rented bikes due to how skewed the data is. There may be some opportunities for transformation that could be worth exploring. 
+
+
+### Question 2 - ANOVA
+
+Create an ANOVA model called *anovamodel* to compare the mean *Rented.Bike.Count* among the different times of day. Display the corresponding ANOVA table.  
+
+```{r}
+#Code to create and display ANOVA table
+anovamodel = aov(Rented.Bike.Count ~ Time, bike)
+summary(anovamodel)
+
+```
+
+A) Using the anovamodel table, give the values of SSE, SSTr.
+
+**Response to Question 2A**: 
+SSE = 2.747e+09
+SSTr = 7.453e+08
+
+
+B)  What is the formula that is used to calculate F-value in the table. Is the between-group variability bigger than the within-group variability at this point? Explain.
+
+**Response to Question 2B**: 
+ Formula: SSTr / SSE
+
+No, the between-group variability is not bigger than  the within-group variability at this point as the mean sq error is 
+
+### Question 3 - Test of Equal Means
+
+A)  Declare the null and alternative hypotheses for the equal means test at different times of the day. Also, mention the criterion used to accept or reject the null hypothesis.
+
+**Response to Question 3A**
+H0: µ1=µ2=µi
+HA: At least two of the means are not equal
+
+we assume a p-value <0.05 to be the criteria to reject the null hypothesis 
+
+
+B)  Based on criterion, do you reject or fail to reject the null hypothesis of the test of equal means at a significance level of $\alpha = 0.05$?  Using the numbers from the ANOVA table, explain your solution. 
+
+**Response to Question 3B**
+we reject the null hypothesis on the grounds that the p-value is very small (<2e-16) and less than our alpha of 0.05. 
+
+
+C)  Based on your response in B, explain the practical significance of your conclusion using context of the problem.
+
+**Response to Question 3C**
+
+This indicates that the time of day holds some significance within our model of how many bikes are rented.  
+
+
+### Question 4 - Pairwise Comparison
+
+Apply the Tukey method to a pairwise comparison of the mean *Rented.Bike.Count* for different times of day.
+For the comparison, use a 95% confidence level.
+
+```{r}
+# Code for pairwise comparison
+TukeyHSD(anovamodel, "Time", conf.level = 0.95)
+```
+
+
+A)  Using the output of Tukey method, identify all pairs that are statistically significantly different. Arrange the time buckets (morning, afternoon, evening, night) in decreasing order of estimated mean rented bike count. Explain how you came to your conclusion. (Hint: consider statistical significance of each pair)
+
+**Response to Question 4A**
+the intervals for evening-afternoon fall completely on the positive side and don’t include zero. Whereas the remaining pairs are on the negative side. 
+
+Afternoon
+Evening
+Morning 
+Night
+
+I came to this conclusion based on the statistical significance of each pair as well as the diff between means for the pair-wise comparisons. 
+
+
+
+B)  Assume that, you got a slightly different output for one pair in the Tukey table, for pairwise mean comparison for night-morning, diff= -33, lwr = -85, upr= 14, p adj = 0.061, what does it explain about the comparison of estimated mean rented bike count between morning and night?
+
+**Response to Question 4B**
+it's interesting because the intervals fall on both the negative and positive side, naturally including zero. However, the p-value is also fairly high. It means that the estimated mean rented bike count between morning and night fall somewhere close to zero which may indicate statistical significance. 
+
+### Question 5 - Simple Linear Regression
+
+Create a linear regression model, called **lm.temp** with *Rented.Bike.Count* as the response variable and with *Temperature* as the predictor.  Include an intercept. Display the summary table for the model.
+
+```{r}
+#Code to fit model and display summary
+lm.temp <- lm(Rented.Bike.Count~Temperature, data=bike)
+summary(lm.temp)
+
+```
+
+A)  What percentage of the variance in *Rented.Bike.Data* is explained by **lm.temp** model?
+
+**Response to Question 5A**
+~32%
+
+
+B)  Give a succinct and reasonable interpretation of the *Temperature* regression coefficient estimate for **lm.temp** model.
+
+**Response to Question 5B**
+For every one unit change in temperature, the number of bikes rented should increase by an additional 29.8 bikes holding all else constant. 
+
+
+### Question 6 - Residual Analysis
+
+Perform residual analysis for the four assumptions of a basic linear regression model on the **lm.temp** model. Explain why you arrived to your conclusions and whether or not each assumption is correct.
+
+```{r}
+# Code for plots
+resids =rstandard(lm.temp)
+#fitted vs. resids
+plot(lm.temp$fitted.values, resids)
+abline(h=0, col="red")
+
+
+par(mfrow=c(2,4))
+for (i in c(1:12)){
+col_name = names(bike[i])
+plot(bike[,i], resids, xlab= col_name, ylab = "S. Residuals")
+abline(h=0, col="red")
+lines(lowess(bike[,i], resids), col='blue')
+}
+
+#qq plot
+qqPlot(resids, ylab="Residuals", main = "")
+```
+
+**Response to Question 6**
+From the residuals/predictor plot, the linearity/mean zero assumption does not appear to hold reasonably well. Data appears to be asymmetrical about the zero line for multiple predictors.
+
+From the residuals/fitted plot, the constant variance assumption does not appear to hold. Lower values have smaller variance than higher values.
+
+From the residuals/fitted plot, the uncorrelated error assumption appears to holds, there are no apparent clusters of residuals.
+
+From the qq plot, the normality assumption does not appear to hold. The data appears to be skewed to the right.
+
+
+### Question 7 - Improving the Fit
+
+A)  Do you think a transformation of the response variable would help improve the fit for this example and why? For **lm.temp**, find the best $\lambda$ value for the Box-Cox transformation, rounded to the closest half integer.
+
+```{r}
+# Code to calculate lambda
+bc<-boxCox(lm.temp)
+bc$x[which.max(bc$y)]
+
+
+```
+
+**Response to Question 7A**:
+Yes, a transformation of the response could be helpful to improve the fit due to the issues addressed above as well as the heteroskedasticity in some of the predictors
+
+
+B)  What kind of response variable transformation does this lambda value suggest? 
+
+**Response to Question 7B**:
+Our lambda is .30 which rounds to a lambda value = 0.5. This equates to a square root transformation of the response variable.
+
+
+C)  Create a new model called **lm.temp2** that uses the response variable's proposed transformation.
+Use *Temperature* as a predictor and include an intercept. Provide the model summary table.
+How does R-square value of **lm.temp2** compares to R-square value of **lm.temp**?
+
+```{r}
+# Code to create new model and display summary
+lm.temp2 <- lm(Rented.Bike.Count^(1/2)~Temperature, data=bike)
+summary(lm.temp2)
+```
+
+**Response to Question 7C**:
+the R-sqaure value of lm.temp2 performs slightly better than lm.temp at ~.36 vs ~.30
+
+
+D)  Rerun the analysis from Question 6 to evaluate the assumptions of **constant variance** and **normality**, and comment on whether or not **these two** linear regression assumptions are valid for **lm.temp2**. 
+
+```{r}
+# Code for plots
+resids2 =rstandard(lm.temp2)
+#fitted vs. resids
+plot(lm.temp2$fitted.values, resids2)
+abline(h=0, col="red")
+
+
+par(mfrow=c(2,4))
+for (i in c(1:12)){
+col_name = names(bike[i])
+plot(bike[,i], resids2, xlab= col_name, ylab = "S. Residuals")
+abline(h=0, col="red")
+lines(lowess(bike[,i], resids2), col='blue')
+}
+
+#qq plot
+qqPlot(resids2, ylab="Residuals", main = "")
+
+
+```
+
+**Response to Question 7D**:
+constant variance: I do not believe the assumption of constant variance holds as we see there is still an issue of the smaller fitted values being closer to zero.
+normality: the assumption of normality appears to hold a little more strongly with this model. The Q-Q plot has less right-tailedness
+
+
+### Question 8 - Multiple Linear Regression
+
+Create a linear regression model, called **lm.full**, with *Rented.Bike.Count* as the response variable and with **ALL** remaining variables (quantitative and qualitative) as the predictors. Include an intercept Display the summary table for the model. *Note: DO NOT transform any predictor or response variables.*   
+
+```{r}
+# Code to create model and display summary
+lm.full<-lm(Rented.Bike.Count~.,data=bike)
+summary(lm.full)
+
+
+
+```
+
+A) Calculate the variance inflation factor (VIF) for each predicting variable of *lm.full* model. Why do we use VIF values? Using threshold of max(10, 1/(1-R-square)), which predicting variables do not detect a high multicollinearity?  
+
+```{r}
+#VIF
+cat("VIF Threshold:", max(10, 1/(1-summary(lm.full)$r.squared)), "\n")
+vif(lm.full)
+
+```
+
+**Response to Question 8A**
+We use VIF values to help detect for collinearity within the model. 
+
+All variables except for Dew point temperature and temperature do not detect a high multicollinearity
+
+
+B) Using **lm.full**, Create a plot for the Cook’s Distances. Using a threshold Cook’s Distance of 0.01, identify the row numbers of any concerning outliers. Note: Do not remove any data points.
+
+```{r}
+# Calculating Cook's distances
+cook=cooks.distance(lm.full)
+# Plotting Cook's distances
+plot(cook)
+abline(h=.01, col="red")
+
+cat("Observation", which(cook>.01), "has a cook's distance that is greater than .01")
+
+
+```
+
+**Response to Question 8B**
+Observation 3950 3965 4087 4208 4987 6454 has a cook's distance that is greater than .01
+
+
+
+### Question 9 - Reduced Model
+
+Create a model named **lm.reduced** with *Rented.Bike.Count* as the response variable and all other variables **except** *Snowfall* and *Solar.Radiation* as predicting variables. Include an intercept. Display the model summary.
+
+```{r}
+# Code to fit and display model
+
+lm.reduced <- lm(Rented.Bike.Count~Temperature+Humidity+Wind.speed+Visibility+Dew.point.temperature+Rainfall+Seasons+Holiday+Time, data=bike)
+
+summary(lm.reduced)
+
+```
+
+A)  Perform a partial F-test on the new model (**lm.reduced**) vs the previous model (**lm.full**), using $\alpha = 0.05$.  State the null hypothesis of this test.  Do you reject or fail to reject the null hypothesis?  Explain your answer given the output.
+
+```{r}
+# Code for partial F-test
+anova(lm.reduced, lm.full)
+
+
+```
+
+**Response to Question 9A**
+H0 : α of each predicting variable = 0
+
+because the p-value<alpha=.05, we reject the null hypothesis, at least one of the additional coefficients is not zero. This means that one of the variables we dropped from the model could provide additional explanatory power. 
+
+B)  Do the variables *Snowfall* and/or *Solar.Radiation* add statistically significant explanatory power to the model, given all other predictors are included in the model? (yes or no should be sufficient if you fully answered Part A)
+
+**Response to Question 9B**
+Yes
+
+
+C)  Is there any case in which we might choose to maintain variables that do not offer statistically significant explanatory/predictive power to the model, (regardless of your response to 9B)? Give an explanation for your choice. 
+
+**Response to Question 9C**
+No, I do not think it would be beneificial to maintain variables that do not offer statistically significant epxlanatory power to the model. It becomes challenging to explain the choices to those trying to adopt your model if there is not explanatory/predictive power in your choices. 
+
+ 
+### Question 10 - Prediction
+
+Using lm.full model, what is the predicted *Rented.Bike.Count* and corresponding 95% prediction interval for an hour with:
+
+* Temperature = 14 degrees Celsius
+* Humidity = 65%
+* Wind.speed = 3 m/s
+* Visibility = 1500
+* Dew.point.temperature = 4.5%
+* Solar.Radiation = 0.8
+* Rainfall = 1
+* Snowfall = 0
+* Seasons = Spring
+* Holiday = yes
+* Time = evening
+
+
+```{r}
+# Code for prediction and prediction interval
+new_data <- data.frame(Temperature=14,Humidity=65,Wind.speed=3,Visibility=1500,Dew.point.temperature=4.5, Solar.Radiation = 0.8, Rainfall=1,Snowfall=0,Seasons='Spring', Holiday='yes',Time='evening')
+
+predict(lm.full, new_data, interval="prediction", level=.95)
+
+```
+
+**Response to Question 10**
+The predicted bike count is 894 with a 95% prediction interval of [70.77, 1717.37]
+
+
+**THE END**
+
